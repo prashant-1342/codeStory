@@ -1,18 +1,15 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function summarizeCommits(commits: string): Promise<string> {
-  const message = await client.messages.create({
-    model: "claude-opus-4-5",
-    max_tokens: 1024,
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
     messages: [
       {
         role: "user",
         content: `You are a helpful assistant that summarizes GitHub commit activity in plain English.
-        
+    
 Here are the recent commits:
 ${commits}
 
@@ -26,5 +23,5 @@ Keep it simple and non-technical, like explaining to a friend what you built thi
     ],
   });
 
-  return message.content[0].type === "text" ? message.content[0].text : "";
+  return response.choices[0].message.content ?? "";
 }

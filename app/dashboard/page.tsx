@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { getRepos, getCommits } from "@/lib/github";
 import { GithubRepo } from "@/lib/github";
+import Link from "next/link";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -62,7 +63,7 @@ export default async function DashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {repos.map((repo: GithubRepo) => (
-              <a
+              <Link
                 key={repo.id}
                 href={`/repos/${repo.name}`}
                 className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-5 flex flex-col gap-3 hover:border-indigo-500/40 hover:bg-white/[0.05] transition-all duration-200"
@@ -85,7 +86,7 @@ export default async function DashboardPage() {
                   <span>🍴 {repo.forks_count}</span>
                   <span>Updated {new Date(repo.pushed_at).toLocaleDateString()}</span>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
