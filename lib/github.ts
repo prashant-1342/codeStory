@@ -1,4 +1,28 @@
-export async function getRepos(accessToken: string) {
+export interface GithubRepo {
+  id: number;
+  name: string;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  pushed_at: string;
+  owner: {
+    login: string;
+  };
+}
+
+export interface GithubCommit {
+  sha: string;
+  commit: {
+    message: string;
+    author: {
+      name: string;
+      date: string;
+    };
+  };
+}
+
+export async function getRepos(accessToken: string): Promise<GithubRepo[]> {
   const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=10", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -7,10 +31,10 @@ export async function getRepos(accessToken: string) {
   });
 
   if (!response.ok) throw new Error("Failed to fetch repos");
-  return response.json();
+  return response.json() as Promise<GithubRepo[]>;
 }
 
-export async function getCommits(accessToken: string, owner: string, repo: string) {
+export async function getCommits(accessToken: string, owner: string, repo: string): Promise<GithubCommit[]> {
   const response = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/commits?per_page=30`,
     {
@@ -22,7 +46,7 @@ export async function getCommits(accessToken: string, owner: string, repo: strin
   );
 
   if (!response.ok) throw new Error("Failed to fetch commits");
-  return response.json();
+  return response.json() as Promise<GithubCommit[]>;
 }
 
 export async function getCommitDetail(accessToken: string, owner: string, repo: string, sha: string) {
