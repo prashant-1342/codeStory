@@ -8,17 +8,16 @@ export async function summarizeCommits(commits: string): Promise<string> {
     messages: [
       {
         role: "user",
-        content: `You are a helpful assistant that summarizes GitHub commit activity in plain English.
-    
-Here are the recent commits:
+        content: `You are a developer's personal journal writer. Based on these recent git commits, write a short, warm, conversational summary of what this developer has been working on. 
+
+Write it like a friend catching up — natural, human, no bullet points, no numbered lists, no headers. Just 3-4 sentences max. Talk directly to the developer using "you".
+
+For example: "This week you were deep in the authentication flow, squashing a stubborn login bug and tightening up the security layer. You also gave the navbar a fresh coat of paint and made sure everything plays nicely on mobile. Solid week of work."
+
+Here are the commits:
 ${commits}
 
-Please provide:
-1. A brief 2-3 sentence overall summary of what was worked on
-2. Key changes made
-3. Most active areas of the codebase
-
-Keep it simple and non-technical, like explaining to a friend what you built this week.`,
+Now write the summary. No intro, no sign-off, just the summary itself.`,
       },
     ],
   });

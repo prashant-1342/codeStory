@@ -18,24 +18,25 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
       setSummary(data.summary);
       setLoading(false);
     }
-
     fetchSummary();
   }, [repoName]);
 
   return (
-    <div className="bg-white/[0.03] border border-indigo-500/20 rounded-xl p-6 flex flex-col gap-3">
+    <div className="bg-amber-50 border-2 border-amber-600 rounded-xl p-6 flex flex-col gap-3 shadow-[3px_3px_0px_0px_#92400e]">
       <div className="flex items-center gap-2">
-        <span className="text-indigo-400 text-sm font-medium">🤖 AI Summary</span>
-        <span className="text-white/20 text-xs">· this week</span>
+        <span className="text-amber-700 text-xs font-black uppercase tracking-widest">
+          ◈ AI Summary
+        </span>
+        <span className="text-amber-400 text-xs font-medium">· this week</span>
       </div>
       {loading ? (
         <div className="flex flex-col gap-2">
-          <div className="h-3 bg-white/[0.05] rounded-full w-full animate-pulse" />
-          <div className="h-3 bg-white/[0.05] rounded-full w-4/5 animate-pulse" />
-          <div className="h-3 bg-white/[0.05] rounded-full w-3/5 animate-pulse" />
+          <div className="h-3 bg-amber-200/60 rounded-full w-full animate-pulse" />
+          <div className="h-3 bg-amber-200/60 rounded-full w-4/5 animate-pulse" />
+          <div className="h-3 bg-amber-200/60 rounded-full w-3/5 animate-pulse" />
         </div>
       ) : (
-        <p className="text-white/70 text-sm leading-relaxed">{summary}</p>
+        <p className="text-amber-900 text-sm leading-relaxed">{summary}</p>
       )}
     </div>
   );

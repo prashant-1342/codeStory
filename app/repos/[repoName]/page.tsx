@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { getCommits, getRepos } from "@/lib/github";
 import { GithubCommit, GithubRepo } from "@/lib/github";
 import AISummaryCard from "@/components/dashboard/AISummaryCard";
+import CommitGraph from "@/components/dashboard/CommitGraph";
+import Link from "next/link";
 
 export default async function RepoPage({ params }: { params: Promise<{ repoName: string }> }) {
   const { repoName } = await params;
@@ -23,28 +25,44 @@ export default async function RepoPage({ params }: { params: Promise<{ repoName:
   );
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white">
-      <div className="max-w-4xl mx-auto px-6 py-10 flex flex-col gap-8">
+    <main className="min-h-screen bg-[#f5f0e8] relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.03]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}
+      />
 
-        <a href="/dashboard" className="text-white/30 hover:text-white/60 text-sm transition-colors w-fit">
-          ← Dashboard
-        </a>
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 flex flex-col gap-8">
 
         <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
+              <span className="text-[#f5f0e8] text-xs font-black tracking-tighter">CS</span>
+            </div>
+            <span className="text-gray-900 font-black text-xl tracking-tight uppercase">
+              Code<span className="text-amber-600">Story</span>
+            </span>
+          </div>
+          <Link href="/dashboard" className="text-gray-400 hover:text-gray-900 text-sm font-bold uppercase tracking-wide transition-colors">
+            ← Dashboard
+          </Link>
+        </div>
+
+        <div className="flex items-start justify-between">
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold tracking-tight">{repo.name}</h1>
+              <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">
+                {repo.name}<span className="text-amber-600">.</span>
+              </h1>
               {repo.language && (
-                <span className="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full uppercase">
                   {repo.language}
                 </span>
               )}
             </div>
             {repo.description && (
-              <p className="text-white/40 text-sm">{repo.description}</p>
+              <p className="text-gray-400 text-sm max-w-lg">{repo.description}</p>
             )}
           </div>
-          <div className="flex items-center gap-4 text-white/30 text-sm">
+          <div className="flex items-center gap-4 text-gray-400 text-sm font-medium">
             <span>⭐ {repo.stargazers_count}</span>
             <span>🍴 {repo.forks_count}</span>
           </div>
@@ -52,25 +70,29 @@ export default async function RepoPage({ params }: { params: Promise<{ repoName:
 
         <AISummaryCard commits={commits} repoName={repo.name} />
 
-        <div className="flex flex-col gap-3">
-          <h2 className="text-white/70 text-sm font-medium uppercase tracking-widest">
+        <CommitGraph commits={commits} />
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-gray-900 font-black text-lg uppercase tracking-widest">
             Recent Commits
           </h2>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {commits.map((commit) => (
               <div
                 key={commit.sha}
-                className="bg-white/[0.03] border border-white/[0.08] rounded-xl p-4 flex flex-col gap-1 hover:border-white/[0.15] transition-all duration-200"
+                className="bg-white border-2 border-gray-900 rounded-xl p-4 flex flex-col gap-1 shadow-[3px_3px_0px_0px_#1a1a1a] hover:shadow-[4px_4px_0px_0px_#92400e] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200"
               >
-                <p className="text-white text-sm font-medium line-clamp-1">
+                <p className="text-gray-900 text-sm font-bold line-clamp-1">
                   {commit.commit.message.split("\n")[0]}
                 </p>
-                <div className="flex items-center gap-3 text-white/30 text-xs">
+                <div className="flex items-center gap-3 text-gray-400 text-xs font-medium">
                   <span>{commit.commit.author.name}</span>
                   <span>·</span>
                   <span>{new Date(commit.commit.author.date).toLocaleDateString()}</span>
                   <span>·</span>
-                  <span className="font-mono">{commit.sha.slice(0, 7)}</span>
+                  <span className="font-mono bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-amber-700">
+                    {commit.sha.slice(0, 7)}
+                  </span>
                 </div>
               </div>
             ))}
@@ -80,4 +102,4 @@ export default async function RepoPage({ params }: { params: Promise<{ repoName:
       </div>
     </main>
   );
-} 
+}
