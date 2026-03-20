@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getRepos, getCommits } from "@/lib/github";
 import { GithubRepo } from "@/lib/github";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -26,32 +27,13 @@ export default async function DashboardPage() {
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10 flex flex-col gap-10">
+      <Navbar />
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
-              <span className="text-[#f5f0e8] text-xs font-black tracking-tighter">CS</span>
-            </div>
-            <span className="text-gray-900 font-black text-xl tracking-tight uppercase">
-              Code<span className="text-amber-600">Story</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-gray-500 text-sm font-medium">
-              Hey, {session.user?.name?.split(" ")[0]} 👋
-            </span>
-            <img
-              src={session.user?.image ?? ""}
-              alt="avatar"
-              className="w-9 h-9 rounded-full border-2 border-gray-900"
-            />
-          </div>
-        </div>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-10 flex flex-col gap-10">
 
         <div className="flex flex-col gap-2">
           <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">
-            Your Story<span className="text-amber-600">.</span>
+            Hey, {session.user?.name?.split(" ")[0]} 👋
           </h1>
           <p className="text-gray-500">Here's what you've been building lately</p>
         </div>

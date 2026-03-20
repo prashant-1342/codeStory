@@ -63,3 +63,53 @@ export async function getCommitDetail(accessToken: string, owner: string, repo: 
   if (!response.ok) throw new Error("Failed to fetch commit detail");
   return response.json();
 }
+export interface GithubCommitFile {
+  filename: string;
+  changes: number;
+  additions: number;
+  deletions: number;
+}
+
+export async function getCommitFiles(accessToken: string, owner: string, repo: string, sha: string): Promise<GithubCommitFile[]> {
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/commits/${sha}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+      },
+    }
+  );
+
+  if (!response.ok) return [];
+  const data = await response.json();
+  return data.files ?? [];
+}
+
+export interface RepoStats {
+  totalAdditions: number;
+  totalDeletions: number;
+  totalChanges: number;
+}
+
+export async function getRepoStats(accessToken: string, owner: string, repo: string, commits: GithubCommit[]): Promise<RepoStats> {
+  const details = await Promise.all(
+    commits.slice(0, 15).map((c) =>
+      fetch(`https://api.github.com/repos/${owner}/${repo}/commits/${c.sha}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }).then((r) => r.json())
+    )
+  );
+
+  return details.reduce(
+    (acc, detail) => ({
+      totalAdditions: acc.totalAdditions + (detail.stats?.additions ?? 0),
+      totalDeletions: acc.totalDeletions + (detail.stats?.deletions ?? 0),
+      totalChanges: acc.totalChanges + (detail.stats?.total ?? 0),
+    }),
+    { totalAdditions: 0, totalDeletions: 0, totalChanges: 0 }
+  );
+}
