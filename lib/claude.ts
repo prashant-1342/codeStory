@@ -8,16 +8,25 @@ export async function summarizeCommits(commits: string): Promise<string> {
     messages: [
       {
         role: "user",
-        content: `You are a developer's personal journal writer. Based on these recent git commits, write a short, warm, conversational summary of what this developer has been working on. 
+        content: `You are a developer tool that generates a clean changelog from git commits.
 
-Write it like a friend catching up — natural, human, no bullet points, no numbered lists, no headers. Just 3-4 sentences max. Talk directly to the developer using "you".
+Analyze these commits and group them into categories. Only include categories that actually have commits. Use exactly these category names and emojis if they apply:
 
-For example: "This week you were deep in the authentication flow, squashing a stubborn login bug and tightening up the security layer. You also gave the navbar a fresh coat of paint and made sure everything plays nicely on mobile. Solid week of work."
+🚀 Features — new things added
+🐛 Bug Fixes — things that were broken and fixed
+♻️ Refactoring — code restructured or improved
+🎨 UI/Design — visual or styling changes
+⚙️ Config — setup, dependencies, configuration changes
+
+Rules:
+- Each point starts with a past tense verb like "Added", "Fixed", "Updated", "Removed"
+- Max 3 points per category
+- Be specific and technical, no hype or motivation
+- If a commit doesn't fit any category skip it
+- No intro, no sign-off, just the changelog
 
 Here are the commits:
-${commits}
-
-Now write the summary. No intro, no sign-off, just the summary itself.`,
+${commits}`,
       },
     ],
   });

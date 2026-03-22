@@ -21,14 +21,17 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
     fetchSummary();
   }, [repoName]);
 
+  const lines = summary.split("\n").filter((l) => l.trim() !== "");
+
   return (
-    <div className="bg-amber-50 border-2 border-amber-600 rounded-xl p-6 flex flex-col gap-3 shadow-[3px_3px_0px_0px_#92400e]">
+    <div className="bg-amber-50 border-2 border-amber-600 rounded-xl p-6 flex flex-col gap-4 shadow-[3px_3px_0px_0px_#92400e]">
       <div className="flex items-center gap-2">
         <span className="text-amber-700 text-xs font-black uppercase tracking-widest">
-          ◈ AI Summary
+          ◈ Changelog
         </span>
         <span className="text-amber-400 text-xs font-medium">· this week</span>
       </div>
+
       {loading ? (
         <div className="flex flex-col gap-2">
           <div className="h-3 bg-amber-200/60 rounded-full w-full animate-pulse" />
@@ -36,7 +39,22 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
           <div className="h-3 bg-amber-200/60 rounded-full w-3/5 animate-pulse" />
         </div>
       ) : (
-        <p className="text-amber-900 text-sm leading-relaxed">{summary}</p>
+        <div className="flex flex-col gap-3">
+          {lines.map((line, i) => {
+            const isHeader = !line.startsWith("•") && !line.startsWith("-");
+            return (
+              <div key={i}>
+                {isHeader ? (
+                  <p className="text-amber-900 text-sm font-black">{line}</p>
+                ) : (
+                  <p className="text-amber-800 text-sm leading-relaxed pl-3">
+                    {line.replace(/^[•-]\s*/, "→ ")}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
