@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   const { commits, repoName } = await req.json();
 
-  const username = session.user?.name!;
+  const username = (session as any)?.username ?? session.user?.name!;
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
   const weekStartDate = weekStart.toISOString().split("T")[0];
