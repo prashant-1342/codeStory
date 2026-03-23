@@ -5,6 +5,7 @@ import { getRepos, getCommits } from "@/lib/github";
 import { GithubRepo } from "@/lib/github";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+import CodingPersonality from "@/components/dashboard/CodingPersonality";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -54,6 +55,7 @@ export default async function DashboardPage() {
             </div>
           ))}
         </div>
+        <CodingPersonality/>
 
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
