@@ -1,14 +1,7 @@
-import Groq from "groq-sdk";
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+import { generateCompletion } from "./ai";
 
 export async function summarizeCommits(commits: string): Promise<string> {
-  const response = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "user",
-        content: `You are a developer tool that generates a clean changelog from git commits.
+  const prompt = `You are a developer tool that generates a clean changelog from git commits.
 
 Analyze these commits and group them into categories. Only include categories that actually have commits. Use exactly these category names and emojis if they apply:
 
@@ -26,10 +19,7 @@ Rules:
 - No intro, no sign-off, just the changelog
 
 Here are the commits:
-${commits}`,
-      },
-    ],
-  });
+${commits}`;
 
-  return response.choices[0].message.content ?? "";
-}
+  return await generateCompletion(prompt);
+}

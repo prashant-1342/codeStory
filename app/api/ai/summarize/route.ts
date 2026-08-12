@@ -39,6 +39,6 @@ export async function POST(req: Request) {
     summary,
     week_start: weekStartDate,
   });
-
   return Response.json({ summary });
 }
+

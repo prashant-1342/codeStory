@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getRepos, getCommits } from "@/lib/github";
-import Groq from "groq-sdk";
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+import { generateCompletion } from "@/lib/ai";
 
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -46,11 +44,7 @@ export async function GET() {
   const totalCommits = commits.length;
   const timeOfDay = getTimeOfDay(peakHour);
 
-  const response = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [{
-      role: "user",
-      content: `You are a fun developer personality analyzer. Based on these coding stats, give this developer a creative personality type title and a 2 sentence description.
+  const prompt = `You are a fun developer personality analyzer. Based on these coding stats, give this developer a creative personality type title and a 2 sentence description.
 
 Stats:
 - Total commits: ${totalCommits}
@@ -68,11 +62,9 @@ Rules:
 - No hype, no "great work"
 
 Respond in this exact JSON format with no extra text:
-{"title": "...", "description": "..."}`,
-    }],
-  });
+{"title": "...", "description": "..."}`;
 
-  const text = response.choices[0].message.content ?? "{}";
+  const text = await generateCompletion(prompt, true);
 
   try {
     const clean = text.replace(/```json|```/g, "").trim();

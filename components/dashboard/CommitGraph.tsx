@@ -8,7 +8,7 @@ interface Props {
 }
 
 function processCommits(commits: GithubCommit[]) {
-  const last30Days: { [key: string]: number } = {};
+  const last30Days: { [key: string]: number } = {}; 
 
   for (let i = 29; i >= 0; i--) {
     const d = new Date();
