@@ -58,6 +58,7 @@ Rules:
 - Give a creative title like "The Midnight Architect" or "The Weekend Warrior" or "The Bug Slayer"
 - 2 sentences max describing their coding personality
 - Be specific using the actual stats
+- Bold all key numbers, times, days, and metrics using double asterisks (e.g. **Fridays**, **18:00**, **6 feature commits**, **5 bug fix commits**)
 - Fun but professional tone
 - No hype, no "great work"
 

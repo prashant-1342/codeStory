@@ -23,7 +23,7 @@ export interface GithubCommit {
 }
 
 export async function getRepos(accessToken: string): Promise<GithubRepo[]> {
-  const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=10", {
+  const response = await fetch("https://api.github.com/user/repos?sort=updated&per_page=100", {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       Accept: "application/vnd.github.v3+json",

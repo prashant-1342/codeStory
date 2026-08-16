@@ -39,11 +39,31 @@ export default function CodingPersonality() {
     return h < 12 ? `${h}am` : `${h - 12}pm`;
   };
 
+  const renderDescription = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return (
+          <strong key={index} className="font-extrabold text-amber-950">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
-    <div className="bg-amber-50 border-2 border-amber-600 rounded-xl p-6 flex flex-col gap-4 shadow-[3px_3px_0px_0px_#92400e]">
-      <span className="text-amber-700 text-xs font-black uppercase tracking-widest">
-        ◈ Your Coding Personality
-      </span>
+    <div className="bg-amber-50 border-2 border-gray-900 rounded-xl p-6 flex flex-col gap-4 shadow-[3px_3px_0px_0px_#1a1a1a]">
+      <div className="flex items-center gap-1.5">
+        <svg className="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        <span className="text-amber-700 text-xs font-black uppercase tracking-widest">
+          Your Coding Personality
+        </span>
+      </div>
 
       {loading ? (
         <div className="flex flex-col gap-2">
@@ -57,8 +77,8 @@ export default function CodingPersonality() {
             <h3 className="text-amber-900 text-2xl font-black tracking-tight">
               {personality?.title}
             </h3>
-            <p className="text-amber-800/70 text-sm leading-relaxed">
-              {personality?.description}
+            <p className="text-amber-800/75 text-sm leading-relaxed">
+              {personality && renderDescription(personality.description)}
             </p>
           </div>
 
@@ -67,11 +87,11 @@ export default function CodingPersonality() {
               {[
                 { label: "Peak Time", value: formatHour(stats.peakHour) },
                 { label: "Best Day", value: stats.peakDay?.slice(0, 3) },
-                { label: "Commits", value: stats.totalCommits },
+                { label: "Feat:Fix Ratio", value: `${stats.feats}:${stats.fixes}` },
               ].map((s) => (
-                <div key={s.label} className="bg-white border border-amber-200 rounded-lg p-3 flex flex-col gap-1">
-                  <span className="text-amber-600 text-xs font-bold uppercase tracking-widest">{s.label}</span>
-                  <span className="text-amber-900 font-black text-lg">{s.value}</span>
+                <div key={s.label} className="bg-amber-100/60 border-0 rounded-lg p-3 flex flex-col gap-1">
+                  <span className="text-amber-600 text-[10px] sm:text-xs font-bold uppercase tracking-widest">{s.label}</span>
+                  <span className="text-amber-900 font-black text-base sm:text-lg">{s.value}</span>
                 </div>
               ))}
             </div>

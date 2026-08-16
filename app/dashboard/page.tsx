@@ -6,6 +6,7 @@ import { GithubRepo } from "@/lib/github";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import CodingPersonality from "@/components/dashboard/CodingPersonality";
+import RepoList from "@/components/dashboard/RepoList";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -64,34 +65,7 @@ export default async function DashboardPage() {
             </h2>
             <span className="text-gray-400 text-sm">{repos.length} total</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {repos.map((repo: GithubRepo) => (
-              <Link
-                key={repo.id}
-                href={`/repos/${repo.name}`}
-                className="bg-white border-2 border-gray-900 rounded-xl p-5 flex flex-col gap-3 shadow-[3px_3px_0px_0px_#1a1a1a] hover:shadow-[5px_5px_0px_0px_#92400e] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-900 font-black uppercase tracking-tight">{repo.name}</span>
-                  {repo.language && (
-                    <span className="text-xs font-bold text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full uppercase">
-                      {repo.language}
-                    </span>
-                  )}
-                </div>
-                {repo.description && (
-                  <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
-                    {repo.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-4 text-gray-400 text-xs font-medium">
-                  <span>⭐ {repo.stargazers_count}</span>
-                  <span>🍴 {repo.forks_count}</span>
-                  <span>Updated {new Date(repo.pushed_at).toLocaleDateString()}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <RepoList repos={repos} />
         </div>
 
       </div>
