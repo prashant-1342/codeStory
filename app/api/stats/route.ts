@@ -8,7 +8,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    const totalCommits = (count || 0) * 30 + 30;
+    const totalCommits = (count || 0) * 3 + 30;
 
     return Response.json({ count: totalCommits });
   } catch (err) {
