@@ -6,20 +6,44 @@ import { GithubCommit } from "@/lib/github";
 export default function AISummaryCard({ commits, repoName }: { commits: GithubCommit[], repoName: string }) {
   const [summary, setSummary] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string>("success");
 
   useEffect(() => {
     async function fetchSummary() {
-      const res = await fetch("/api/ai/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ commits, repoName }),
-      });
-      const data = await res.json();
-      setSummary(data.summary);
-      setLoading(false);
+      try {
+        const res = await fetch("/api/ai/summarize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ commits, repoName }),
+        });
+        const data = await res.json();
+        setStatus(data.status || "success");
+        setSummary(data.summary || "");
+      } catch (err) {
+        console.error(err);
+        setStatus("error");
+      } finally {
+        setLoading(false);
+      }
     }
     fetchSummary();
   }, [repoName]);
+
+  const getRelativeTimeString = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return "just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "yesterday";
+    if (diffDays < 30) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   let parsedSummary: {
     features?: string[];
@@ -46,6 +70,10 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
     config: "⚙️ Config",
   };
 
+  const hasItems = Object.values(parsedSummary).some(
+    (arr) => Array.isArray(arr) && arr.length > 0
+  );
+
   return (
     <div className="bg-amber-50 border-2 border-amber-600 rounded-xl p-6 flex flex-col gap-4 shadow-[3px_3px_0px_0px_#92400e]">
       <div className="flex items-center gap-2">
@@ -60,6 +88,17 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
           <div className="h-3 bg-amber-200/60 rounded-full w-full animate-pulse" />
           <div className="h-3 bg-amber-200/60 rounded-full w-4/5 animate-pulse" />
           <div className="h-3 bg-amber-200/60 rounded-full w-3/5 animate-pulse" />
+        </div>
+      ) : status === "no_commits" ? (
+        <p className="text-amber-800 text-sm font-bold italic">No commits yet.</p>
+      ) : status === "no_commits_this_week" || !hasItems ? (
+        <div className="flex flex-col gap-1.5">
+          <p className="text-amber-900 text-sm font-black uppercase tracking-wider">No new commits this week</p>
+          {commits[0]?.commit.author.date && (
+            <p className="text-amber-800 text-xs leading-relaxed">
+              Last activity: <span className="font-bold">{getRelativeTimeString(commits[0].commit.author.date)}</span>
+            </p>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-5">
@@ -80,9 +119,6 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
               </div>
             );
           })}
-          {Object.keys(parsedSummary).length === 0 && (
-            <p className="text-amber-800 text-sm italic">No updates recorded this week.</p>
-          )}
         </div>
       )}
     </div>

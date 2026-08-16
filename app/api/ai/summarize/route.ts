@@ -11,8 +11,21 @@ export async function POST(req: Request) {
 
   const username = (session as any)?.username ?? session.user?.name!;
   const weekStart = new Date();
+  weekStart.setHours(0, 0, 0, 0);
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
   const weekStartDate = weekStart.toISOString().split("T")[0];
+
+  if (!commits || commits.length === 0) {
+    return Response.json({ status: "no_commits" });
+  }
+
+  const latestCommitDate = new Date(commits[0].commit.author.date);
+  if (latestCommitDate < weekStart) {
+    return Response.json({
+      status: "no_commits_this_week",
+      lastCommitDate: commits[0].commit.author.date,
+    });
+  }
 
   const existing = await supabaseAdmin
     .from("summaries")
@@ -23,10 +36,15 @@ export async function POST(req: Request) {
     .single();
 
   if (existing.data) {
-    return Response.json({ summary: existing.data.summary });
+    return Response.json({ status: "success", summary: existing.data.summary });
   }
 
-  const commitsText = commits
+  const thisWeekCommits = commits.filter((c: any) => {
+    const commitDate = new Date(c.commit.author.date);
+    return commitDate >= weekStart;
+  });
+
+  const commitsText = thisWeekCommits
     .slice(0, 20)
     .map((c: any) => `- ${c.commit.message}`)
     .join("\n");
@@ -39,6 +57,7 @@ export async function POST(req: Request) {
     summary,
     week_start: weekStartDate,
   });
-  return Response.json({ summary });
+
+  return Response.json({ status: "success", summary });
 }
 
