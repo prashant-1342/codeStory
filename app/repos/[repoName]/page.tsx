@@ -1,12 +1,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { getCommits, getRepos } from "@/lib/github";
+import { getCommits, getRepos, getRepoHealth } from "@/lib/github";
 import { GithubCommit, GithubRepo } from "@/lib/github";
 import AISummaryCard from "@/components/dashboard/AISummaryCard";
 import CommitGraph from "@/components/dashboard/CommitGraph";
 import MostChangedFiles from "@/components/dashboard/MostChangedFiles";
 import RepoStats from "@/components/dashboard/RepoStats";
+import RepoHealthSnapshot from "@/components/dashboard/RepoHealthSnapshot";
 import Navbar from "@/components/layout/Navbar";
 import Link from "next/link";
 
@@ -21,11 +22,10 @@ export default async function RepoPage({ params }: { params: Promise<{ repoName:
 
   if (!repo) redirect("/dashboard");
 
-  const commits: GithubCommit[] = await getCommits(
-    session.accessToken!,
-    repo.owner.login,
-    repo.name
-  );
+  const [commits, health] = await Promise.all([
+    getCommits(session.accessToken!, repo.owner.login, repo.name),
+    getRepoHealth(session.accessToken!, repo.owner.login, repo.name),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#f5f0e8] relative overflow-hidden">
@@ -64,6 +64,8 @@ export default async function RepoPage({ params }: { params: Promise<{ repoName:
         </div>
 
         <RepoStats commits={commits} owner={repo.owner.login} repo={repo.name} />
+
+        <RepoHealthSnapshot health={health} lastCommitDate={commits[0]?.commit.author.date} />
 
         <AISummaryCard commits={commits} repoName={repo.name} />
 

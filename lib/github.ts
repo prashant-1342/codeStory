@@ -113,3 +113,82 @@ export async function getRepoStats(accessToken: string, owner: string, repo: str
     { totalAdditions: 0, totalDeletions: 0, totalChanges: 0 }
   );
 }
+
+export interface RepoHealth {
+  openIssues: number;
+  openPRs: number;
+  license: string | null;
+  hasReadme: boolean;
+  hasCI: boolean;
+  hasTests: boolean;
+}
+
+export async function getRepoHealth(accessToken: string, owner: string, repo: string): Promise<RepoHealth> {
+  const headers = {
+    Authorization: `Bearer ${accessToken}`,
+    Accept: "application/vnd.github.v3+json",
+  };
+
+  const [repoInfoRes, pullsRes, contentsRes] = await Promise.all([
+    fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers }),
+    fetch(`https://api.github.com/repos/${owner}/${repo}/pulls?state=open&per_page=100`, { headers }),
+    fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, { headers }),
+  ]);
+
+  if (!repoInfoRes.ok) throw new Error("Failed to fetch repo info");
+
+  const repoInfo = await repoInfoRes.json();
+  const pulls = pullsRes.ok ? await pullsRes.json() : [];
+  const contents = contentsRes.ok ? await contentsRes.json() : [];
+
+  const openPRs = Array.isArray(pulls) ? pulls.length : 0;
+  const openIssues = Math.max(0, (repoInfo.open_issues_count ?? 0) - openPRs);
+  const license = repoInfo.license?.spdx_id ?? null;
+
+  const hasReadme = Array.isArray(contents) && contents.some(
+    (item: any) => item.name.toLowerCase().startsWith("readme")
+  );
+
+  const hasTests = Array.isArray(contents) && contents.some(
+    (item: any) => {
+      const name = item.name.toLowerCase();
+      if (item.type === "dir" && (name === "test" || name === "tests" || name === "__tests__")) {
+        return true;
+      }
+      if (item.type === "file" && (
+        name.startsWith("jest.config") ||
+        name.startsWith("vitest.config") ||
+        name.startsWith("playwright.config") ||
+        name.startsWith("cypress.config")
+      )) {
+        return true;
+      }
+      return false;
+    }
+  );
+
+  const hasDotGithub = Array.isArray(contents) && contents.some(
+    (item: any) => item.type === "dir" && item.name === ".github"
+  );
+
+  let hasCI = false;
+  if (hasDotGithub) {
+    const workflowsRes = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/.github/workflows`,
+      { headers }
+    );
+    if (workflowsRes.ok) {
+      const workflows = await workflowsRes.json();
+      hasCI = Array.isArray(workflows) && workflows.length > 0;
+    }
+  }
+
+  return {
+    openIssues,
+    openPRs,
+    license,
+    hasReadme,
+    hasCI,
+    hasTests,
+  };
+}
