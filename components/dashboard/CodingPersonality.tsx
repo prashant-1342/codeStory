@@ -39,21 +39,6 @@ export default function CodingPersonality() {
     return h < 12 ? `${h}am` : `${h - 12}pm`;
   };
 
-  const renderDescription = (text: string) => {
-    if (!text) return null;
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return (
-          <strong key={index} className="font-extrabold text-amber-950">
-            {part.slice(2, -2)}
-          </strong>
-        );
-      }
-      return part;
-    });
-  };
-
   return (
     <div className="bg-amber-50 border-2 border-gray-900 rounded-xl p-6 flex flex-col gap-4 shadow-[3px_3px_0px_0px_#1a1a1a]">
       <div className="flex items-center gap-1.5">
@@ -78,7 +63,7 @@ export default function CodingPersonality() {
               {personality?.title}
             </h3>
             <p className="text-amber-800/75 text-sm leading-relaxed">
-              {personality && renderDescription(personality.description)}
+              {personality?.description}
             </p>
           </div>
 
