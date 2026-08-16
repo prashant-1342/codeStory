@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Footer from "@/components/layout/Footer";
 
 const features = [
@@ -16,10 +16,26 @@ const features = [
 export default function LoginPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [commitsCount, setCommitsCount] = useState("30+");
 
   useEffect(() => {
     if (session) router.push("/dashboard");
   }, [session, router]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/stats");
+        const data = await res.json();
+        if (data.count) {
+          setCommitsCount(`${data.count}+`);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchStats();
+  }, []);
 
   return (
     <main className="relative overflow-hidden bg-[#f5f0e8]">
@@ -94,7 +110,7 @@ export default function LoginPage() {
 
             <div className="grid grid-cols-3 gap-3">
               {[
-                { value: "30+", label: "Commits analyzed" },
+                { value: commitsCount, label: "Commits analyzed" },
                 { value: "AI", label: "Powered summaries" },
                 { value: "Free", label: "No credit card" },
               ].map((s) => (
