@@ -59,7 +59,7 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
   } catch (err) {
     console.error("Failed to parse summary JSON", err);
     parsedSummary = {
-      features: ["Updates this week"]
+      features: ["Updates recently"]
     };
   }
 
@@ -80,7 +80,7 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
         <span className="text-amber-700 text-xs font-black uppercase tracking-widest">
           ◈ Changelog
         </span>
-        <span className="text-amber-400 text-xs font-medium">· this week</span>
+        <span className="text-amber-400 text-xs font-medium">· recent activity</span>
       </div>
 
       {loading ? (
@@ -91,9 +91,9 @@ export default function AISummaryCard({ commits, repoName }: { commits: GithubCo
         </div>
       ) : status === "no_commits" ? (
         <p className="text-amber-800 text-sm font-bold italic">No commits yet.</p>
-      ) : status === "no_commits_this_week" || !hasItems ? (
+      ) : !hasItems ? (
         <div className="flex flex-col gap-1.5">
-          <p className="text-amber-900 text-sm font-black uppercase tracking-wider">No new commits this week</p>
+          <p className="text-amber-900 text-sm font-black uppercase tracking-wider">Not enough activity to summarize yet</p>
           {commits[0]?.commit.author.date && (
             <p className="text-amber-800 text-xs leading-relaxed">
               Last activity: <span className="font-bold">{getRelativeTimeString(commits[0].commit.author.date)}</span>
