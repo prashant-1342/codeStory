@@ -16,9 +16,14 @@ export default function Footer() {
         <div className="text-center sm:text-right">
           <p className="text-xs font-bold text-gray-900 uppercase tracking-widest">
             Developed by{" "}
-            <span className="text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full font-black ml-1">
+            <a
+              href="https://www.linkedin.com/in/prashantpal11/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full font-black ml-1 hover:bg-amber-200 transition-colors"
+            >
               Prashant
-            </span>
+            </a>
           </p>
         </div>
       </div>
