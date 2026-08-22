@@ -16,7 +16,7 @@ const features = [
 export default function LoginPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [commitsCount, setCommitsCount] = useState("30+");
+  const [commitsCount, setCommitsCount] = useState("");
 
   useEffect(() => {
     if (session) router.push("/dashboard");
