@@ -15,16 +15,16 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, account,profile }) {
+    async jwt({ token, account, profile }) {
       if (account) {
         token.accessToken = account.access_token;
-        token.username = (profile as any)?.login;
+        token.username = (profile as { login?: string })?.login;
       }
       return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken as string;
-      (session as any).username = token.username;
+      session.accessToken = token.accessToken;
+      session.username = token.username;
       return session;
     },
   },
